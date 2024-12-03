@@ -1,0 +1,882 @@
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>RULE 34</title>
+        <style>
+            body {
+                font-family: 'Arial', sans-serif;
+                margin: 0;
+                padding: 0;
+                background-color: #121212;
+                color: #f4f4f4;
+            }
+
+            .header {
+                position: sticky;
+                top: 0;
+                z-index: 1000;
+                background-color: #121212;
+                padding: 20px 0;
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.7);
+            }
+
+            .container {
+                width: 90%;
+                margin: auto;
+            }
+
+            h1 {
+                text-align: center;
+                font-size: 2.0rem;
+                color: #f4f4f4;
+                text-transform: uppercase;
+            }
+
+            @media (max-width: 1536px) {
+                h1 {
+                    font-size: 1.5rem;
+                }
+                .header {
+                    position: static;
+                }
+            }
+
+            .author-videos-btn {
+                position: absolute;
+                bottom: 20px;
+                right: 20px;
+                padding: 10px 20px;
+                background-color: #ff9800;
+                color: #121212;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+                font-size: 16px;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+                transition: background-color 0.3s ease, transform 0.2s ease;
+                z-index: 1200;
+            }
+
+            .author-videos-btn:hover {
+                background-color: #ff5722;
+                transform: scale(1.05);
+            }
+
+            .author-name {
+                color: #ff9800;
+                cursor: pointer;
+                text-decoration: underline;
+                transition: color 0.3s ease;
+            }
+
+            .author-name:hover {
+                color: #ff5722;
+            }
+
+            /* Модальное окно */
+            #age-modal {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.9);
+                z-index: 2000;
+                justify-content: center;
+                align-items: center;
+            }
+
+            #age-modal.active {
+                display: flex;
+            }
+
+            .modal-content {
+                background-color: #1e1e1e;
+                padding: 20px;
+                border-radius: 10px;
+                box-shadow: -0px -0px 20px 20px rgba(255, 152, 0, 0.5);
+                text-align: center;
+                color: #f4f4f4;
+                max-width: 400px;
+                width: 90%;
+            }
+
+            .modal-content h2 {
+                margin-bottom: 20px;
+                font-size: 24px;
+                color: #ff9800;
+            }
+
+            .modal-content p {
+                margin-bottom: 30px;
+                font-size: 16px;
+            }
+
+            .modal-buttons {
+                display: flex;
+                justify-content: space-around;
+                gap: 10px;
+            }
+
+            .modal-button {
+                padding: 10px 20px;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+                font-size: 16px;
+                color: #121212;
+                background-color: #ff9800;
+                transition: background-color 0.3s ease, color 0.3s ease;
+            }
+
+            .modal-button:hover {
+                background-color: #ff5722;
+                color: #fff;
+            }
+
+            .modal-button.no {
+                background-color: #555;
+            }
+
+            .modal-button.no:hover {
+                background-color: #777;
+            }
+
+            .nav-btn {
+                position: absolute;
+                top: 50%;
+                transform: translateY(-50%);
+                background-color: rgba(0, 0, 0, 0.7);
+                border: none;
+                color: #ff9800;
+                font-size: 30px;
+                cursor: pointer;
+                padding: 10px 15px;
+                border-radius: 50%;
+                z-index: 1100;
+                transition: background-color 0.3s ease, color 0.3s ease;
+            }
+
+            .nav-btn:hover {
+                background-color: rgba(255, 152, 0, 0.8);
+                color: #121212;
+            }
+
+            .prev-btn {
+                left: 10px;
+            }
+
+            .next-btn {
+                right: 10px;
+            }
+
+            #filters {
+                margin-top: 10px;
+                display: flex;
+                justify-content: center;
+                gap: 20px;
+                align-items: center;
+            }
+
+            #filters input[type="text"] {
+                padding: 10px;
+                font-size: 16px;
+                border: 1px solid #333;
+                border-radius: 5px;
+                background-color: #1e1e1e;
+                color: #f4f4f4;
+                outline: none;
+                transition: all 0.3s ease;
+            }
+
+            #filters input[type="text"]:focus {
+                border-color: #ff9800;
+                box-shadow: 0 0 10px rgba(255, 152, 0, 0.7);
+            }
+
+            .filter-button {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 34px;
+                height: 34px;
+                background-color: #1e1e1e;
+                border-radius: 10px;
+                cursor: pointer;
+                transition: transform 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+                border: 2px solid #ff9800;
+            }
+
+            .filter-button svg {
+                width: 24px;
+                height: 24px;
+                fill: #ff9800;
+                transition: fill 0.3s ease;
+                vertical-align: middle;
+            }
+
+            @media (max-width: 768px) {
+                #search-filter {
+                    width: 100%;
+                }
+
+                #filters {
+                    align-items: stretch;
+                    flex-wrap: wrap;
+                }
+
+                #filters input[type="text"] {
+                    margin-bottom: 15px;
+                }
+
+                .filter-button {
+                    justify-content: center;
+                }
+
+                .filter-button svg {
+                    width: 24px;
+                    height: 24px;
+                }
+
+                #filters {
+                    gap: 5px; /* Уменьшаем расстояние между элементами */
+                }
+
+                #filters input[type="text"] {
+                    flex-grow: 1; /* Растягиваем поле ввода, чтобы занять доступное пространство */
+                    min-width: 200px; /* Устанавливаем минимальную ширину */
+                }
+
+                .filter-button {
+                    width: 30px; /* Уменьшаем размер кнопок для компактности */
+                    height: 30px;
+                }
+            }
+
+            @media (min-width: 1536px) {
+                .filter-button:hover {
+                    transform: scale(1.1);
+                    background-color: #ff9800;
+                    box-shadow: 0 6px 12px rgba(255, 152, 0, 0.5);
+                }
+                .filter-button:hover svg {
+                    fill: #121212;
+                }
+            }
+
+            #futa-filter svg {
+                width: 28px;
+                height: 28px;
+            }
+
+            /* Иконка Horse Filter остается как было */
+            #horse-filter svg {
+                width: 24px;
+                height: 24px;
+            }
+
+            #viewed-filter svg {
+                width: 24px;
+                height: 24px;
+            }
+
+            #shuffle-filter svg {
+                width: 24px;
+                height: 24px;
+                transition: fill 0.3s ease;
+            }
+
+            .filter-button.active svg {
+                fill: #121212;
+            }
+
+            .filter-button.active svg {
+                fill: #121212;
+            }
+
+            .filter-button.active {
+                background-color: #ff9800;
+                box-shadow: 0 6px 12px rgba(255, 152, 0, 0.5);
+            }
+
+            .filter-button.active svg {
+                fill: #121212;
+            }
+
+            #video-gallery {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 20px;
+                justify-content: center;
+                margin-top: 20px;
+            }
+
+            .video-item {
+                background: #1e1e1e;
+                border-radius: 10px;
+                overflow: hidden;
+                text-align: center;
+                width: 220px;
+                box-shadow: 0 8px 15px rgba(0, 0, 0, 0.5);
+                transition: transform 0.3s ease, box-shadow 0.3s ease;
+                cursor: pointer;
+            }
+
+            @media (max-width: 768px) {
+                .video-item {
+                    width: 100%;
+                }
+            }
+
+
+            @media (min-width: 768px) {
+                .video-item:hover {
+                    transform: translateY(-10px);
+                    box-shadow: 0 12px 20px rgba(255, 152, 0, 0.3);
+                }
+            }
+
+            .video-item img {
+                max-width: 100%;
+                border-bottom: 1px solid #333;
+            }
+
+            .video-item .title {
+                padding: 10px;
+                font-size: 16px;
+                font-weight: bold;
+                color: #ff9800;
+            }
+
+            .video-item a {
+                display: inline-block;
+                margin: 10px 0;
+                padding: 8px 12px;
+                color: #121212;
+                background-color: #ff9800;
+                text-decoration: none;
+                border-radius: 5px;
+                font-size: 14px;
+                transition: background-color 0.3s ease, color 0.3s ease;
+            }
+
+            .video-item a:hover {
+                background-color: #ff5722;
+                color: #fff;
+            }
+
+            .video-item p {
+                margin: 5px 0;
+                font-size: 14px;
+                color: #ccc;
+            }
+
+            #video-modal {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.9);
+                justify-content: center;
+                align-items: center;
+                z-index: 1000;
+            }
+
+            #video-modal video {
+                width: 80%;
+                max-height: 80%;
+                border: 3px solid #ff9800;
+                border-radius: 10px;
+                box-shadow: 0 8px 15px rgba(255, 152, 0, 0.7);
+            }
+
+            #video-modal .close-btn {
+                position: absolute;
+                top: 20px;
+                right: 20px;
+                color: #ff9800;
+                font-size: 30px;
+                cursor: pointer;
+                transition: color 0.3s ease;
+            }
+
+            /* Просмотрено */
+            #video-modal .close-btn:hover {
+                color: #ff5722;
+            }
+
+            .video-item.viewed {
+                opacity: 0.6; /* Видео становится более прозрачным */
+                filter: grayscale(10%); /* Применяется эффект черно-белого изображения */
+            }
+
+            .video-item.viewed .title {
+                color: #bbb; /* Уменьшаем яркость текста */
+            }
+        </style>
+    </head>
+    <body>
+    <div class="header">
+        <div class="container">
+            <h1>Personal collection of worth mention 3D Rule 34 videos
+            </h1>
+            <div id="filters">
+                <input type="text" id="search-filter" placeholder="Search">
+                <div class="filter-button" id="futa-filter">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -18 90 122.5" preserveAspectRatio="xMidYMid meet">
+                        <path d="M76.939,19.746h5.922L82.859,8.538l0.002-6.363H77H65.75l-0.019,6.013h7.206l-12.769,13.03  c-4.166-3.605-9.588-5.794-15.516-5.794c-5.721,0-10.975,2.033-15.078,5.415l-3.243-3.392l3.26-3.275l-4.195-4.176l-3.156,3.17  L17.408,8.11l6.705-0.015L24.1,2.175L12.893,2.2l-5.92,0.014l0.013,5.919l0.026,11.208l5.92-0.013l-0.017-7.35l5.147,5.385  l-3.455,3.471l4.196,4.177l3.351-3.366l3.346,3.501l0.022-0.021c-2.896,3.936-4.612,8.792-4.612,14.042  c0,12.132,9.147,22.158,20.904,23.565v9.117H31.085v5.922h10.729V88.5h5.92V77.771h10.729V71.85H47.734v-9.146  c11.64-1.518,20.658-11.491,20.658-23.536c0-5.031-1.578-9.699-4.258-13.543l12.803-12.806L76.939,19.746z M44.653,56.617  c-9.624,0-17.453-7.829-17.453-17.451c0-9.623,7.829-17.452,17.453-17.452c9.623,0,17.453,7.829,17.453,17.452  C62.104,48.788,54.275,56.617,44.653,56.617z"/>
+                    </svg>
+                </div>
+                <div class="filter-button" id="horse-filter">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 188.902 188.902" preserveAspectRatio="xMidYMid meet">
+                        <path d="M174.873,113.481c-21.775,11.732-23.855-9.641-23.855-9.641c-18.011-2.081-31.398-22.198-31.398-22.198 c-24.32,12.563-10.764,47.998-0.283,61.604c13.464,17.438,3.605,45.655,3.605,45.655s-54.902-4.438-82.929-39.649 c-21.045-26.434-15.601-51.424-9.617-67.918c7.208-19.821,16.952-30.7,31.159-42.271c21.119-17.221,60.139-19.375,60.139-19.375 c0.255-1.463,1.454-3.171,2.985-4.927c-4.699,0.127-10.438,0.52-16.976,1.375c-4.457,0.86-9.383,1.351-14.372,2.813 c-5.107,1.103-10.282,2.875-15.578,4.903c-5.29,1.974-10.491,4.776-15.628,7.693c-4.879,3.401-10.06,6.537-14.159,11.015 c-4.702,3.833-8.127,8.813-11.644,13.589c-3.673,4.685-5.477,10.4-8.225,15.321c-2.039,5.251-3.177,10.663-4.717,15.616 c-1.386,4.992-1.365,9.993-2.068,14.485c-0.594,4.504-1.046,8.635-0.704,12.329c0.121,3.688,0.195,6.922,0.281,9.563 c0.157,5.297,0.254,8.334,0.254,8.334l-0.732,0.065c0,0-0.63-2.967-1.454-8.311c-0.394-2.665-0.884-5.929-1.41-9.676 c-0.804-3.747-0.827-8.026-0.479-12.72c0.266-3.381,0.316-7.046,0.629-10.802L8.898,90.16l9.011-11.042l-9.46-1.354l13.515-10.368 l-9.921-3.156l13.982-7.66l-10.592-3.153l18.255-5.867l-12.62-3.605l20.507-5.642l-11.26-5.175l20.732-2.707l-10.14-5.857 l25.307-2.651c0.121-0.056,0.243-0.115,0.358-0.156l-11.695-5.296l26.602-2.252L69.289,7.9l50.318,3.993 c2.719,0.121,5.095,0.334,7.258,0.57C133.326,6.271,143.486,0,143.486,0c-2.092,2.084-2.926,13.406-2.926,13.406 c2.087-3.783,8.79-7.548,8.79-7.548c-3.76,8.79,0,27.63,0,27.63c10.899,10.902,23.04,48.581,23.04,48.581l4.622,6.694 C182.84,97.161,180.689,110.343,174.873,113.481z"/>
+                    </svg>
+                </div>
+                <div class="filter-button" id="viewed-filter">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 12" preserveAspectRatio="xMidYMid meet">
+                        <path d="M6,2C4,2,2,3,0,6c2,3,4,4,6,4s4-1,6-4C10,3,8,2,6,2z M6,8.5C4.621582,8.5,3.5,7.3789063,3.5,6   S4.621582,3.5,6,3.5S8.5,4.6210938,8.5,6S7.378418,8.5,6,8.5z"/>
+                    </svg>
+                </div>
+                <div class="filter-button" id="shuffle-filter">
+                    <svg fill="#000000" height="800px" width="800px" version="1.1" id="Layer_1"
+                         xmlns="http://www.w3.org/2000/svg"
+                         viewBox="0 0 423.757 423.757" xml:space="preserve">
+                        <g>
+                            <g>
+                                <path d="M189.294,385.219l112.522,38.538l98.514-98.509l-113.3-37.765L189.294,385.219z M239.962,379.203
+                                    c-5.96,5.96-15.672,8.54-21.699,5.76c-6.021-2.78-6.077-9.861-0.113-15.821c5.96-5.96,15.672-8.54,21.699-5.76
+                                    C245.875,366.162,245.921,373.243,239.962,379.203z M276.298,391.931c-5.96,5.96-15.672,8.54-21.699,5.76
+                                    c-6.021-2.78-6.077-9.861-0.113-15.821c5.965-5.96,15.672-8.54,21.699-5.76C282.207,378.89,282.258,385.971,276.298,391.931z
+                                     M349.56,334.94c5.96-5.96,15.672-8.54,21.699-5.76c6.021,2.78,6.077,9.861,0.118,15.821s-15.672,8.54-21.699,5.76
+                                    S343.601,340.9,349.56,334.94z M313.331,323.031c5.96-5.96,15.672-8.54,21.699-5.76c6.021,2.78,6.077,9.861,0.113,15.821
+                                    c-5.96,5.96-15.672,8.54-21.699,5.76C307.423,336.072,307.372,328.991,313.331,323.031z M312.415,388.019
+                                    c6.021,2.78,6.077,9.861,0.113,15.821c-5.96,5.96-15.672,8.54-21.699,5.76s-6.077-9.861-0.118-15.821
+                                    C296.676,387.825,306.388,385.244,312.415,388.019z M298.693,304.538c6.021,2.78,6.077,9.861,0.113,15.821
+                                    c-5.96,5.96-15.672,8.54-21.699,5.76c-6.021-2.78-6.077-9.861-0.113-15.821C282.954,304.338,292.667,301.763,298.693,304.538z"/>
+                                <path d="M402.158,311.634l-37.202-111.611l-111.611-37.207l37.202,111.606L402.158,311.634z M319.281,224.118
+                                    c4.168-4.168,12.544-2.555,18.708,3.61s7.782,14.541,3.61,18.708c-4.168,4.168-12.544,2.555-18.708-3.61
+                                    C316.726,236.662,315.108,228.285,319.281,224.118z"/>
+                                <path d="M135.171,0L29.939,52.613l105.231,52.613l105.226-52.613L135.171,0z M135.171,63.288c-8.714,0-15.785-4.782-15.785-10.675
+                                    c0-5.898,7.066-10.675,15.785-10.675s15.785,4.782,15.785,10.675C150.95,58.511,143.885,63.288,135.171,63.288z"/>
+                                <path d="M162.22,201.728c5.028-1.853,9.231,1.08,10.685,6.702l63.022-63.022l12.805,4.27V63.529l-106.819,53.412v122.481
+                                    l10.798-10.798c-1.101-1.951-1.761-4.48-1.761-7.475C150.95,212.716,155.999,204.022,162.22,201.728z M230.956,86.866
+                                    c6.226-2.294,11.269,2.678,11.269,11.105c0,8.427-5.043,17.121-11.269,19.415c-6.226,2.294-11.269-2.678-11.269-11.105
+                                    C219.686,97.853,224.73,89.16,230.956,86.866z M198.843,142.003c6.226-2.294,11.269,2.678,11.269,11.105
+                                    c0,8.427-5.043,17.121-11.269,19.415c-6.226,2.294-11.269-2.678-11.269-11.105C187.574,152.991,192.622,144.297,198.843,142.003z
+                                     M150.95,140.175c0-8.427,5.043-17.121,11.269-19.415c6.226-2.294,11.269,2.678,11.269,11.105c0,8.428-5.043,17.121-11.269,19.415
+                                    C155.994,153.574,150.95,148.603,150.95,140.175z"/>
+                                <path d="M21.599,202.839l105.313,51.579l1.51-1.51V116.941L21.599,63.529V202.839z M107.855,201.728
+                                    c6.226,2.294,11.269,10.988,11.269,19.415s-5.043,13.399-11.269,11.105c-6.226-2.294-11.269-10.988-11.269-19.415
+                                    C96.586,204.406,101.635,199.434,107.855,201.728z M75.011,140.298c6.226,2.294,11.269,10.987,11.269,19.415
+                                    c0,8.427-5.043,13.399-11.269,11.105c-6.226-2.294-11.269-10.988-11.269-19.415C63.741,142.976,68.79,138.004,75.011,140.298z
+                                     M41.208,86.866c6.226,2.294,11.269,10.987,11.269,19.415c0,8.427-5.043,13.399-11.269,11.105
+                                    c-6.226-2.294-11.269-10.987-11.269-19.415C29.939,89.544,34.982,84.572,41.208,86.866z"/>
+                                <path d="M239.726,164.639l-98.514,98.504l38.543,112.533l97.736-97.746L239.726,164.639z M197.655,338.565
+                                    c-5.96,5.96-13.046,5.909-15.821-0.118c-2.775-6.026-0.2-15.739,5.76-21.699c5.96-5.96,13.046-5.909,15.821,0.113
+                                    C206.19,322.883,203.615,332.605,197.655,338.565z M230.525,221.773c-5.96,5.96-13.046,5.908-15.821-0.113
+                                    c-2.78-6.021-0.2-15.739,5.76-21.699c5.96-5.96,13.046-5.908,15.821,0.113C239.066,206.1,236.485,215.813,230.525,221.773z"/>
+                            </g>
+                        </g>
+                        </svg>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div id="video-gallery"></div>
+    </div>
+
+    <!-- Модальное окно для проверки возраста -->
+    <div id="age-modal">
+        <div class="modal-content">
+            <h2>Age Verification</h2>
+            <p>Are you 18 years or older?</p>
+            <div class="modal-buttons">
+                <button class="modal-button yes" onclick="confirmAge()">Yes</button>
+                <button class="modal-button no" onclick="redirectToDisney()">No</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Video Player -->
+    <div id="video-modal">
+        <span class="close-btn">&times;</span>
+        <button class="nav-btn prev-btn">&lt;</button>
+        <video loop id="video-player" controls></video>
+        <button class="nav-btn next-btn">&gt;</button>
+        <button class="author-videos-btn" id="author-videos-btn">Show All from Author</button>
+    </div>
+
+    <script>
+        // Установить куки
+        function setCookie(name, value, days) {
+            const expires = new Date(Date.now() + days * 864e5).toUTCString();
+            document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires}; path=/`;
+        }
+
+        // Получить куки
+        function getCookie(name) {
+            return document.cookie.split('; ').reduce((r, v) => {
+                const parts = v.split('=');
+                return parts[0] === name ? decodeURIComponent(parts[1]) : r;
+            }, '');
+        }
+
+        // Подтвердить возраст
+        function confirmAge() {
+            setCookie('isAdult', 'yes', 30);
+            closeAgeModal();
+        }
+
+        // Перенаправить на Disney
+        function redirectToDisney() {
+            window.location.href = 'https://www.disney.com/?intoverride=true';
+        }
+
+        // Показать модальное окно
+        function showAgeModal() {
+            document.getElementById('age-modal').classList.add('active');
+        }
+
+        // Закрыть модальное окно
+        function closeAgeModal() {
+            document.getElementById('age-modal').classList.remove('active');
+        }
+
+        // Проверка возраста при загрузке страницы
+        window.onload = function() {
+            const isAdult = getCookie('isAdult');
+            if (!isAdult) {
+                showAgeModal();
+            }
+        };
+    </script>
+
+    <script>
+        let videoData = [];
+        let filteredData = [];
+        let currentIndex = 0;
+        const itemsPerLoad = 50;
+        const gallery = document.getElementById('video-gallery');
+        const modal = document.getElementById('video-modal');
+        const videoPlayer = document.getElementById('video-player');
+        const closeModal = document.querySelector('.close-btn');
+        const searchFilter = document.getElementById('search-filter');
+        const futaFilter = document.getElementById('futa-filter');
+        const horseFilter = document.getElementById('horse-filter');
+        const viewedFilter = document.getElementById('viewed-filter');
+        const shuffleFilter = document.getElementById('shuffle-filter');
+        const modalAuthorButton = document.getElementById('author-videos-btn');
+        let futaActive = false;
+        let horseActive = false;
+        let viewedFilterActive = false;
+        let currentVideoIndex = 0;
+        let currentModalAuthor = '';
+
+        let features = {
+            buttonHideViewed: true,
+            downloadButtonOnPreview: true,
+            shuffleButton: true,
+            clickableAuthor: true,
+            modalAuthorButton: true,
+            closeButtonXModal: false,
+        }
+
+        if (!features.shuffleButton) {
+            shuffleFilter.style.display = 'none';
+        }
+
+        if (!features.closeButtonXModal) {
+            closeModal.style.display = 'none';
+        }
+
+        if (!features.modalAuthorButton) {
+            modalAuthorButton.style.display = 'none';
+        }
+
+        if (!features.buttonHideViewed) {
+            viewedFilter.style.display = 'none';
+        }
+
+        // Функция для рендеринга видео
+        function loadVideos() {
+            const itemsToRender = filteredData.slice(currentIndex, currentIndex + itemsPerLoad);
+            itemsToRender.forEach(video => {
+                const videoItem = document.createElement('div');
+                videoItem.classList.add('video-item');
+                videoItem.setAttribute('data-url', `http://wellsee.gdn/xyzfgh/videos/${video.url}`);
+
+                const thumbnailUrl = `http://wellsee.gdn/xyzfgh/previews/${video.thumbnail}`;
+
+                videoItem.innerHTML = `
+                    <img src="${thumbnailUrl}" alt="${video.name}">
+                    <div class="title">${video.name}</div>
+                    ${features.downloadButtonOnPreview ? '<a href="http://wellsee.gdn/xyzfgh/videos/${video.url}" download>Download Video</a>' : ""}
+                    <p>Duration: ${video.duration}</p>
+                    <p>Author: ${features.clickableAuthor ? `<span class="author-name">${video.author}</span>` : video.author}</p>
+                `;
+
+                gallery.appendChild(videoItem);
+            });
+
+            currentIndex += itemsPerLoad;
+            updateViewedVideosUI();
+        }
+
+        function getFilteredData(search) {
+            const viewedVideos = getViewedVideos();
+            return videoData.filter(video => {
+                const isViewed = viewedVideos.includes(`http://wellsee.gdn/xyzfgh/videos/${video.url}`);
+                return (
+                    (!search || Object.values(video).toString().toLowerCase().includes(search)) &&
+                    (!futaActive || video.futa === 'yes') &&
+                    (!horseActive || video.horse === 'yes') &&
+                    (!viewedFilterActive || !isViewed)
+                );
+            });
+        }
+
+        // Фильтрация и сброс индекса
+        function applyFilter() {
+            const search = searchFilter.value.trim().toLowerCase();
+
+
+            filteredData = getFilteredData(search);
+
+            gallery.innerHTML = '';
+            currentIndex = 0;
+
+            loadVideos();
+        }
+
+        // Подгрузка по скроллу
+        window.addEventListener('scroll', () => {
+            if ((window.innerHeight + window.scrollY) * 1.5 >= document.body.offsetHeight) {
+                loadVideos();
+            }
+        });
+
+        init();
+
+        // Событие фильтрации
+        searchFilter.addEventListener('input', applyFilter);
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        shuffleFilter.addEventListener('click', () => {
+            filteredData = shuffleArray([...getFilteredData(searchFilter.value.trim().toLowerCase())]);
+            gallery.innerHTML = ''; // Очищаем галерею
+            currentIndex = 0; // Сбрасываем индекс
+            loadVideos(); // Загружаем перемешанные видео
+        });
+
+        futaFilter.addEventListener('click', () => {
+            futaActive = !futaActive;
+            if (futaActive) {
+                futaFilter.classList.add('active');
+            } else {
+                futaFilter.classList.remove('active');
+            }
+            applyFilter();
+        });
+
+        horseFilter.addEventListener('click', () => {
+            horseActive = !horseActive;
+            if (horseActive) {
+                horseFilter.classList.add('active');
+            } else {
+                horseFilter.classList.remove('active');
+            }
+            applyFilter();
+        });
+
+        viewedFilter.addEventListener('click', () => {
+            viewedFilterActive = !viewedFilterActive;
+            if (viewedFilterActive) {
+                viewedFilter.classList.add('active');
+            } else {
+                viewedFilter.classList.remove('active');
+            }
+            applyFilter();
+        });
+
+        function closeModalFunc() {
+            modal.style.display = 'none';
+            videoPlayer.pause();
+            videoPlayer.src = '';
+        }
+
+        // Закрытие модального окна
+        closeModal.addEventListener('click', closeModalFunc);
+
+        // Закрытие модального окна при клике вне видео
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                closeModalFunc()
+            }
+        });
+
+        // Навигация через кнопки
+        function openModal(index) {
+            currentVideoIndex = index;
+            const video = filteredData[index];
+            currentModalAuthor = video.author;
+            modalAuthorButton.textContent = `Author: ${currentModalAuthor}`;
+            const videoUrl = `http://wellsee.gdn/xyzfgh/videos/${filteredData[index].url}`;
+            markAsViewed(videoUrl)
+            updateViewedVideosUI()
+            videoPlayer.src = videoUrl;
+            modal.classList.add('active');
+            videoPlayer.play();
+        }
+
+        function navigateVideo(direction) {
+            if (direction === 'next') {
+                currentVideoIndex = (currentVideoIndex + 1) % filteredData.length;
+            } else if (direction === 'prev') {
+                currentVideoIndex = (currentVideoIndex - 1 + filteredData.length) % filteredData.length;
+            }
+            openModal(currentVideoIndex);
+        }
+
+        document.querySelector('.prev-btn').addEventListener('click', () => navigateVideo('prev'));
+        document.querySelector('.next-btn').addEventListener('click', () => navigateVideo('next'));
+
+        // Обработка клавиш в модальном окне
+        document.addEventListener('keydown', (e) => {
+            if (modal.style.display === 'flex') {
+                if (e.key === 'Escape') {
+                    closeModalFunc();
+                } else if (e.key === 'ArrowRight') {
+                    navigateVideo('next');
+                } else if (e.key === 'ArrowLeft') {
+                    navigateVideo('prev');
+                }
+            }
+        });
+
+        // Просмотрено
+        const VIEWED_VIDEOS_KEY = 'viewedVideos';
+
+        // Получить список просмотренных видео из localStorage
+        function getViewedVideos() {
+            if (!features.buttonHideViewed) return [];
+            const viewed = localStorage.getItem(VIEWED_VIDEOS_KEY);
+            return viewed ? JSON.parse(viewed) : [];
+        }
+
+        // Сохранить список просмотренных видео в localStorage
+        function saveViewedVideos(viewedVideos) {
+            localStorage.setItem(VIEWED_VIDEOS_KEY, JSON.stringify(viewedVideos));
+        }
+
+        // Отметить видео как просмотренное
+        function markAsViewed(videoUrl) {
+            if (features.buttonHideViewed) {
+                const viewedVideos = getViewedVideos();
+                if (!viewedVideos.includes(videoUrl)) {
+                    viewedVideos.push(videoUrl);
+                    saveViewedVideos(viewedVideos);
+                }
+            }
+        }
+
+        // Обновить интерфейс галереи, добавив класс `viewed` к просмотренным видео
+        function updateViewedVideosUI() {
+            const viewedVideos = getViewedVideos();
+            document.querySelectorAll('.video-item').forEach(videoItem => {
+                const videoUrl = videoItem.getAttribute('data-url');
+                if (viewedVideos.includes(videoUrl)) {
+                    videoItem.classList.add('viewed');
+                }
+            });
+        }
+
+        // Открытие видео при нажатии на плитку
+        gallery.addEventListener('click', (e) => {
+            if (e.target.classList.contains('author-name')) {
+                return;
+            }
+            const videoItem = e.target.closest('.video-item');
+            if (videoItem) {
+                const index = Array.from(gallery.children).indexOf(videoItem);
+                currentVideoIndex = index;
+                const video = filteredData[index];
+                currentModalAuthor = video.author
+                modalAuthorButton.textContent = `Author: ${currentModalAuthor}`;
+                const videoUrl = videoItem.getAttribute('data-url');
+                markAsViewed(videoUrl); // Отметить как просмотренное
+                updateViewedVideosUI(); // Обновить интерфейс
+                videoPlayer.src = videoUrl;
+                modal.style.display = 'flex';
+                videoPlayer.play();
+            }
+        });
+
+        // Обработчик для кликов по автору в превью
+        gallery.addEventListener('click', (e) => {
+            if (e.target.classList.contains('author-name')) {
+                searchFilter.value = e.target.textContent.trim(); // Установим значение в поле фильтра
+                applyFilter(); // Применим фильтрацию
+            }
+        });
+
+        // Кнопка показать всё от текушего автора на модальном окне
+        modalAuthorButton.addEventListener('click', () => {
+            if (currentModalAuthor) {
+                closeModalFunc()
+                searchFilter.value = currentModalAuthor; // Устанавливаем имя автора в поле поиска
+                applyFilter(); // Применяем фильтрацию
+                modal.style.display = 'none'; // Закрываем модальное окно
+            }
+        });
+
+        document.addEventListener('touchstart', (e) => {
+            touchStartX = e.changedTouches[0].clientX;
+        }, false);
+
+        document.addEventListener('touchmove', (e) => {
+            touchEndX = e.changedTouches[0].clientX;
+        }, false);
+
+        document.addEventListener('touchend', () => {
+            handleSwipe();
+        }, false);
+
+        function handleSwipe() {
+            if (touchStartX - touchEndX > 50) {
+                // Свайп влево — следующее видео
+                navigateVideo('next');
+            } else if (touchEndX - touchStartX > 50) {
+                // Свайп вправо — предыдущее видео
+                navigateVideo('prev');
+            }
+        }
+
+        // Инициализация
+        async function init() {
+            videoData = await fetch('./videos.json').then(res => res.json());
+            filteredData = [...videoData];
+            loadVideos();
+            updateViewedVideosUI(); // Обновить интерфейс после загрузки
+        }
+
+    </script>
+
+    </body>
+    </html>
